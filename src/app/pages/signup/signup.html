@@ -25,6 +25,22 @@
           Username is required
         </p>
       </ion-text>
+      <ion-text color="danger">
+        <p *ngIf="userNameExists === true" padding-left>
+          Username already exists
+        </p>
+      </ion-text>
+
+      <ion-item>
+        <ion-label position="stacked" color="primary">Email</ion-label>
+        <ion-input [(ngModel)]="signup.email" name="email" type="email" #email="ngModel" required>
+        </ion-input>
+      </ion-item>
+      <ion-text color="danger">
+        <p [hidden]="email.valid || submitted == false" padding-left>
+          Username is required
+        </p>
+      </ion-text>
 
       <ion-item>
         <ion-label position="stacked" color="primary">Password</ion-label>
@@ -33,7 +49,23 @@
       </ion-item>
       <ion-text color="danger">
         <p [hidden]="password.valid || submitted == false" padding-left>
-          Password is required
+          Password must fit required format
+        </p>
+      </ion-text>
+
+      <ion-item>
+        <ion-label position="stacked" color="primary">Confirm Password</ion-label>
+        <ion-input [(ngModel)]="confirmPassword" name="password" type="password" #confirmPasswordInput="ngModel" required>
+        </ion-input>
+      </ion-item>
+      <ion-text color="danger">
+        <p [hidden]="confirmPasswordInput.valid || submitted == false" padding-left>
+          Password must fit required format
+        </p>
+      </ion-text>
+      <ion-text color="danger">
+        <p [hidden]="confirmPassword == signup.password || submitted == false" padding-left>
+          Passwords must match
         </p>
       </ion-text>
     </ion-list>

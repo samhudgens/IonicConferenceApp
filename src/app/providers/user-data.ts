@@ -1,7 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Events } from '@ionic/angular';
 import { Storage } from '@ionic/storage';
+import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from 'angularfire2/firestore';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
+import { User } from '../models';
 
 @Injectable({
   providedIn: 'root'
@@ -10,11 +14,16 @@ export class UserData {
   _favorites: string[] = [];
   HAS_LOGGED_IN = 'hasLoggedIn';
   HAS_SEEN_TUTORIAL = 'hasSeenTutorial';
+  usersCollection: AngularFirestoreCollection<User>;
+  users: Observable<User[]>;
 
   constructor(
+    private afs: AngularFirestore,
     public events: Events,
     public storage: Storage
-  ) { }
+  ) {
+    this.usersCollection = this.afs.collection('usersSH', ref => ref.orderBy('date', 'asc'));
+   }
 
   hasFavorite(sessionName: string): boolean {
     return (this._favorites.indexOf(sessionName) > -1);
@@ -31,18 +40,39 @@ export class UserData {
     }
   }
 
-  login(username: string): Promise<any> {
-    return this.storage.set(this.HAS_LOGGED_IN, true).then(() => {
-      this.setUsername(username);
-      return this.events.publish('user:login');
-    });
+  // login(username: string): Promise<any> {
+  //   return this.storage.set(this.HAS_LOGGED_IN, true).then(() => {
+  //     this.setUsername(username);
+  //     return this.events.publish('user:login');
+  //   });
+  // }
+
+  // signup(username: string): Promise<any> {
+  //   return this.storage.set(this.HAS_LOGGED_IN, true).then(() => {
+  //     this.setUsername(username);
+  //     return this.events.publish('user:signup');
+  //   });
+  // }
+
+  signup(user: User) {
+    // Get users
+    // Check if username is already taken
+    // Check if email is already taken
+    // Add the user to the collection
+    this.usersCollection.add(user);
+    // Log in
   }
 
-  signup(username: string): Promise<any> {
-    return this.storage.set(this.HAS_LOGGED_IN, true).then(() => {
-      this.setUsername(username);
-      return this.events.publish('user:signup');
-    });
+  getUsers(): Observable<User[]> {
+    this.users = this.usersCollection.snapshotChanges()
+    .pipe(map(response => {
+      return response.map(action => {
+        const data = action.payload.doc.data() as User;
+        data.id = action.payload.doc.id;
+        return data;
+      });
+    }));
+    return this.users;
   }
 
   logout(): Promise<any> {
