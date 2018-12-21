@@ -44,10 +44,10 @@ export class LoginPage implements OnInit {
         this.userData.login(this.login.username);
         this.router.navigateByUrl('/app/tabs/(schedule:schedule)');
       } else {
-        alert("Invalid password");
+        alert('Invalid password');
       }
     } else {
-      alert("Username not found");
+      alert('Username not found');
     }
   }
 
@@ -56,7 +56,7 @@ export class LoginPage implements OnInit {
   }
 
   passWordMatches(user: User, password: string) {
-    return 
+    return;
   }
 
   onSignup() {

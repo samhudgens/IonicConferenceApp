@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 @Injectable({
   providedIn: 'root'
 })
-export class functionData {
+export class FunctionData {
 
   getDateFormat(date: Date) {
     if (!date) {

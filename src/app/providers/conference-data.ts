@@ -10,7 +10,6 @@ import { UserData } from './user-data';
 })
 export class ConferenceData {
   tracksCollection: AngularFireStoreCollection<Track>;
-  
   data: any;
 
   constructor(public http: HttpClient, public user: UserData) {}
