@@ -1,9 +1,10 @@
 import { Component, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
-import { ActionSheetController } from '@ionic/angular';
+import { ActionSheetController, AlertController } from '@ionic/angular';
 
-import { ConferenceData } from '../../providers/conference-data';
+import { Speaker } from '../../models';
+import { SpeakerData } from '../../providers/speaker-data';
 
 @Component({
   selector: 'page-speaker-list',
@@ -12,22 +13,23 @@ import { ConferenceData } from '../../providers/conference-data';
   encapsulation: ViewEncapsulation.None
 })
 export class SpeakerListPage {
-  speakers: any[] = [];
+  speakers: Speaker[];
 
   constructor(
     public actionSheetCtrl: ActionSheetController,
-    public confData: ConferenceData,
+    public alertCtrl: AlertController,
+    private speakerProvider: SpeakerData,
     public inAppBrowser: InAppBrowser,
     public router: Router
   ) {}
 
   ionViewDidEnter() {
-    this.confData.getSpeakers().subscribe((speakers: any[]) => {
-      this.speakers = speakers;
-    });
+    this.speakerProvider.getSpeakers().subscribe(
+      speakers => { this.speakers = speakers; }
+    );
   }
 
-  goToSpeakerTwitter(speaker: any) {
+  goToSpeakerTwitter(speaker: Speaker) {
     this.inAppBrowser.create(
       `https://twitter.com/${speaker.twitter}`,
       '_blank'

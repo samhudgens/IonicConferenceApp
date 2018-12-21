@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { Support } from '../models';
-import { functionData } from './function-data';
+import { FunctionData } from './function-data';
 import { UserData } from './user-data';
 
 @Injectable({
@@ -20,7 +20,7 @@ export class SupportData {
   support: Observable<Support> ;
 
   constructor(private afs: AngularFirestore,
-              private functionProvider: functionData,
+              private functionProvider: FunctionData,
               private userProvider: UserData,
               public events: Events) {
     this.supportsCollection = this.afs.collection(

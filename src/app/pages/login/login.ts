@@ -5,7 +5,6 @@ import { Router } from '@angular/router';
 import { UserData } from '../../providers/user-data';
 import { User } from '../../models';
 
-
 @Component({
   selector: 'page-login',
   templateUrl: 'login.html',
@@ -13,50 +12,41 @@ import { User } from '../../models';
   encapsulation: ViewEncapsulation.None
 })
 export class LoginPage implements OnInit {
-  login = { username: '', password: '' };
-  submitted = false;
+  username: '';
+  password: '' ;
   users: User[];
 
-  constructor(
-    public userData: UserData,
-    public router: Router
-  ) { }
+  constructor(public userData: UserData,
+              public router: Router,
+              private userProvider: UserData) { }
 
   ngOnInit() {
-    this.userData.getUsers().subscribe(
-      (data: User[]) => {
-        this.users = data;
-      }
+    this.userProvider.getUsers().subscribe(
+      (data: User[]) => { this.users = data; }
     );
   }
 
   onLogin(form: NgForm) {
-    this.submitted = true;
-    console.log(this.users);
-    const user = this.users.find(user => user.username === form.value.username);
-    console.log(form.value);
-    console.log(form.value.username);
-    console.log(user);
-    if (form.valid
-      && user
-      ) {
-      if (user.password === this.login.password) {
-        this.userData.login(this.login.username);
-        this.router.navigateByUrl('/app/tabs/(schedule:schedule)');
+    if (form.valid) {
+      const user = this.findUser(this.username.toLowerCase().trim());
+      if (user) {
+        if (user.password === this.password) {
+          this.userData.login(user);
+          this.router.navigateByUrl('/app/tabs/(schedule:schedule)');
+        } else {
+          alert('Invalid password. Try again.');
+        }
       } else {
-        alert('Invalid password');
+        alert('User not found. Try again.');
       }
-    } else {
-      alert('Username not found');
     }
   }
 
-  userNameExists(username: string) {
-    return this.users.find(user => user.username === username);
-  }
-
-  passWordMatches(user: User, password: string) {
-    return;
+  findUser(data: string) {
+    if (data.indexOf('@') > -1) {
+      return this.users.find(user => user.email.toLowerCase() === data);
+    }
+    return this.users.find(user => user.username.toLowerCase() === data);
   }
 
   onSignup() {
