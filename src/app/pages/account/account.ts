@@ -1,10 +1,9 @@
 import { AfterViewInit, Component, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
-
 import { AlertController } from '@ionic/angular';
 
 import { UserData } from '../../providers/user-data';
-
+import { User } from '../../models';
 
 @Component({
   selector: 'page-account',
@@ -13,16 +12,22 @@ import { UserData } from '../../providers/user-data';
   encapsulation: ViewEncapsulation.None
 })
 export class AccountPage implements AfterViewInit {
-  username: string;
+  users: User[];
+  user: User;
+  succeed: boolean;
+  jobDescription: string;
 
-  constructor(
-    public alertCtrl: AlertController,
-    public router: Router,
-    public userData: UserData
-  ) { }
+  constructor(public alertCtrl: AlertController,
+              public router: Router,
+              public userProvider: UserData) {}
 
   ngAfterViewInit() {
-    this.getUsername();
+    this.userProvider.getUsers().subscribe(
+      users => this.users = users
+    );
+    this.userProvider.getUser().then(
+      user => this.user = user
+    );
   }
 
   updatePicture() {
@@ -33,15 +38,22 @@ export class AccountPage implements AfterViewInit {
   // clicking OK will update the username and display it
   // clicking Cancel will close the alert and do nothing
   async changeUsername() {
-    const alert = await this.alertCtrl.create({
+    this.succeed = false;
+    const changeForm = await this.alertCtrl.create({
       header: 'Change Username',
       buttons: [
         'Cancel',
         {
           text: 'Ok',
           handler: (data: any) => {
-            this.userData.setUsername(data.username);
-            this.getUsername();
+            if (this.isTheValueUsed(data.username)) {
+              alert(data.username + ' was used already. Try another.');
+            } else {
+              this.user.username = data.username;
+              this.userProvider.updateUser(this.user);
+              this.succeed = true;
+              this.jobDescription = 'Username has been changed.';
+            }
           }
         }
       ],
@@ -49,26 +61,102 @@ export class AccountPage implements AfterViewInit {
         {
           type: 'text',
           name: 'username',
-          value: this.username,
-          placeholder: 'username'
+          value: this.user.username,
+          placeholder: 'new username'
         }
       ]
     });
-    await alert.present();
+    await changeForm.present();
   }
 
-  getUsername() {
-    this.userData.getUsername().then((username) => {
-      this.username = username;
+  async changeEmail() {
+    this.succeed = false;
+    const changeForm = await this.alertCtrl.create({
+      header: 'Change Email',
+      buttons: [
+        'Cancel',
+        {
+          text: 'Ok',
+          handler: (data: any) => {
+            if (this.isTheValueUsed(data.email)) {
+              alert(data.email + ' was used already. Try another.');
+            } else {
+              this.user.email = data.email;
+              this.userProvider.updateUser(this.user);
+              this.succeed = true;
+              this.jobDescription = 'Email has been changed.';
+            }
+          }
+        }
+      ],
+      inputs: [
+        {
+          type: 'email',
+          name: 'email',
+          value: this.user.email,
+          placeholder: 'new email'
+        }
+      ]
     });
+    await changeForm.present();
   }
 
-  changePassword() {
-    console.log('Clicked to change password');
+  async changePassword() {
+    this.succeed = false;
+    const changeForm = await this.alertCtrl.create({
+      header: 'Change Password',
+      buttons: [
+        'Cancel',
+        {
+          text: 'Ok',
+          handler: (data: any) => {
+            if (this.user.password !== data.currentPW) {
+              alert('Current password does not match your password.');
+            } else if (data.newPW.length < 4) {
+              alert('Password should be more than 3 characters.');
+            } else if (data.newPW !== data.confirmPW) {
+              alert('New password does not match Confirm password.');
+            } else {
+              this.user.password = data.newPW;
+              this.userProvider.updateUser(this.user);
+              this.succeed = true;
+              this.jobDescription = 'Password has been changed.';
+            }
+          }
+        }
+      ],
+      inputs: [
+        {
+          type: 'password',
+          name: 'newPW',
+          placeholder: 'new password'
+        },
+        {
+          type: 'password',
+          name: 'confirmPW',
+          placeholder: 'confirm password'
+        },
+        {
+          type: 'password',
+          name: 'currentPW',
+          placeholder: 'current password'
+        }
+      ]
+    });
+    await changeForm.present();
+  }
+
+  isTheValueUsed(value: string) {
+    if (value.indexOf('@') < 0) {
+      return this.users.find(
+        user => user.username.toLowerCase() === value.toLowerCase());
+    }
+    return this.users.find(
+      user => user.email.toLowerCase() === value.toLowerCase());
   }
 
   logout() {
-    this.userData.logout();
+    this.userProvider.logout();
     this.router.navigateByUrl('/login');
   }
 

@@ -1,3 +1,4 @@
+// These are the categories for filtering stuff
 export interface Track {
   id?: string;
   name: string;
@@ -8,6 +9,8 @@ export interface Speaker {
   name: string;
   profilePic?: string;
   twitter?: string;
+  github?: string;
+  instagram?: string;
   about?: string;
   location?: string;
   email: string;
@@ -46,4 +49,28 @@ export interface User {
   password: string;
   email: string;
   favorites: IdName[];       // session's id and name.
+  trackFilter: { name: string, isChecked: boolean }[];
+}
+
+export interface Support {
+  id?: string;
+  userId: string;
+  date: string;             // 2018-12-19
+  support: string;
+}
+
+export interface PartOfDay {
+  partOfDay: string;    // morning, afternoon, evening, overnight
+  timeFrom: string;
+  timeTo: string;
+}
+
+export interface Schedule {
+  date: string; // 2018-12-06
+  groups: SessionGroup[];
+}
+
+export interface SessionGroup {
+  time: PartOfDay;
+  sessions: Session[];
 }
