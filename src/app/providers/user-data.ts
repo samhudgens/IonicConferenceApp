@@ -10,7 +10,7 @@ import { User } from '../models';
 @Injectable({
   providedIn: 'root'
 })
-export class UserData {
+export class UserProvider {
   _favorites: string[] = [];
   HAS_LOGGED_IN = 'hasLoggedIn';
   HAS_SEEN_TUTORIAL = 'hasSeenTutorial';
@@ -22,8 +22,53 @@ export class UserData {
     public events: Events,
     public storage: Storage
   ) {
-    this.usersCollection = this.afs.collection('usersSH', ref => ref.orderBy('date', 'asc'));
+    this.usersCollection = this.afs.collection('usersSH', ref => ref.orderBy('username', 'asc'));
    }
+
+   getUsers(): Observable<User[]> {
+    this.users = this.usersCollection.snapshotChanges()
+    .pipe(map(response => {
+      return response.map(action => {
+        const data = action.payload.doc.data() as User;
+        data.id = action.payload.doc.id;
+        return data;
+      });
+    }));
+    return this.users;
+  }
+
+  signup(user: User) {
+    this.usersCollection.add(user)
+    .then(res => {
+      user.id = res.id;
+      this.login(user);
+    });
+  }
+
+  login(user: User): Promise<any> {
+    return this.storage.set(this.HAS_LOGGED_IN, true).then(() => {
+      this.setUser(user);
+      return this.events.publish('user:login');
+    });
+  }
+
+  logout(): Promise<any> {
+    return this.storage.remove(this.HAS_LOGGED_IN).then(() => {
+      return this.storage.remove('username');
+    }).then(() => {
+      this.events.publish('user:logout');
+    });
+  }
+
+  setUser(user: User): Promise<any> {
+    return this.storage.set('user', user);
+  }
+
+  getUsername(): Promise<string> {
+    return this.storage.get('user').then((value) => {
+      return value;
+    });
+  }
 
   hasFavorite(sessionName: string): boolean {
     return (this._favorites.indexOf(sessionName) > -1);
@@ -38,59 +83,6 @@ export class UserData {
     if (index > -1) {
       this._favorites.splice(index, 1);
     }
-  }
-
-  // login(username: string): Promise<any> {
-  //   return this.storage.set(this.HAS_LOGGED_IN, true).then(() => {
-  //     this.setUsername(username);
-  //     return this.events.publish('user:login');
-  //   });
-  // }
-
-  // signup(username: string): Promise<any> {
-  //   return this.storage.set(this.HAS_LOGGED_IN, true).then(() => {
-  //     this.setUsername(username);
-  //     return this.events.publish('user:signup');
-  //   });
-  // }
-
-  signup(user: User) {
-    // Get users
-    // Check if username is already taken
-    // Check if email is already taken
-    // Add the user to the collection
-    this.usersCollection.add(user);
-    // Log in
-  }
-
-  getUsers(): Observable<User[]> {
-    this.users = this.usersCollection.snapshotChanges()
-    .pipe(map(response => {
-      return response.map(action => {
-        const data = action.payload.doc.data() as User;
-        data.id = action.payload.doc.id;
-        return data;
-      });
-    }));
-    return this.users;
-  }
-
-  logout(): Promise<any> {
-    return this.storage.remove(this.HAS_LOGGED_IN).then(() => {
-      return this.storage.remove('username');
-    }).then(() => {
-      this.events.publish('user:logout');
-    });
-  }
-
-  setUsername(username: string): Promise<any> {
-    return this.storage.set('username', username);
-  }
-
-  getUsername(): Promise<string> {
-    return this.storage.get('username').then((value) => {
-      return value;
-    });
   }
 
   isLoggedIn(): Promise<boolean> {

@@ -2,7 +2,7 @@ import { Component, ViewEncapsulation, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 
-import { UserData } from '../../providers/user-data';
+import { UserProvider } from '../../providers/user-data';
 
 // import { UserOptions } from '../../interfaces/user-options';
 import { User, IdName } from '../../models';
@@ -26,11 +26,11 @@ export class SignupPage implements OnInit {
 
   constructor(
     public router: Router,
-    public userData: UserData
+    public userProvider: UserProvider
   ) { }
 
   ngOnInit() {
-    this.userData.getUsers().subscribe(
+    this.userProvider.getUsers().subscribe(
       (data: User[]) => {
         this.users = data;
       }
@@ -39,25 +39,24 @@ export class SignupPage implements OnInit {
 
   onSignup(form: NgForm) {
     this.submitted = true;
-
-    if (form.valid
-      && this.userNameExists(form.value.username) === false
-      && !this.userEmailExists(form.value.email)) {
-      this.userData.signup(form.value);
-      this.router.navigateByUrl('/app/tabs/(schedule:schedule)');
+    if (form.valid && this.signup.password === this.confirmPassword) {
+      if (this.userNameExists(this.signup.username)) {
+        alert('Username is already taken.');
+      } else if (this.userEmailExists(this.signup.email)) {
+        alert('Email is already taken.');
+      } else {
+        this.userProvider.signup(this.signup);
+        this.router.navigateByUrl('/app/tabs/(schedule:schedule)');
+      }
     }
   }
 
   userNameExists(username: string) {
-    if (this.users.find(user => user.username === username)) {
-      return true;
-    } else {
-      return false;
-    }
+    return (this.users.find(user => user.username.toLowerCase() === username.toLowerCase()));
   }
 
   userEmailExists(email: string) {
-    return this.users.find(user => user.email === email);
+    return this.users.find(user => user.email.toLowerCase() === email.toLowerCase());
   }
 
 }

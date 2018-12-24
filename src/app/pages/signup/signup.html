@@ -26,7 +26,7 @@
         </p>
       </ion-text>
       <ion-text color="danger">
-        <p *ngIf="userNameExists === true" padding-left>
+        <p *ngIf="userNameExists == true" padding-left>
           Username already exists
         </p>
       </ion-text>
@@ -38,7 +38,7 @@
       </ion-item>
       <ion-text color="danger">
         <p [hidden]="email.valid || submitted == false" padding-left>
-          Username is required
+          Email is required
         </p>
       </ion-text>
 

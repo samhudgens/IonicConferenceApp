@@ -5,7 +5,7 @@ import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { Events, MenuController, Platform } from '@ionic/angular';
 import { Storage } from '@ionic/storage';
 
-import { UserData } from './providers/user-data';
+import { UserProvider } from './providers/user-data';
 
 @Component({
   selector: 'app-root',
@@ -46,7 +46,7 @@ export class AppComponent implements OnInit {
     private splashScreen: SplashScreen,
     private statusBar: StatusBar,
     private storage: Storage,
-    private userData: UserData
+    private userProvider: UserProvider
   ) {
     this.initializeApp();
   }
@@ -64,7 +64,7 @@ export class AppComponent implements OnInit {
   }
 
   checkLoginStatus() {
-    return this.userData.isLoggedIn().then(loggedIn => {
+    return this.userProvider.isLoggedIn().then(loggedIn => {
       return this.updateLoggedInStatus(loggedIn);
     });
   }
@@ -94,7 +94,7 @@ export class AppComponent implements OnInit {
   }
 
   logout() {
-    this.userData.logout().then(() => {
+    this.userProvider.logout().then(() => {
       return this.navigate('/app/tabs/(schedule:schedule)');
     });
   }
