@@ -4,7 +4,7 @@ import { AlertController, List, LoadingController, ModalController, ToastControl
 
 import { ScheduleFilterPage } from '../schedule-filter/schedule-filter';
 import { ConferenceData } from '../../providers/conference-data';
-import { UserProvider } from '../../providers/user-data';
+import { UserData } from '../../providers/user-data';
 
 @Component({
   selector: 'page-schedule',
@@ -31,7 +31,7 @@ export class SchedulePage {
     public modalCtrl: ModalController,
     public router: Router,
     public toastCtrl: ToastController,
-    public user: UserProvider
+    public user: UserData
   ) { }
 
   ionViewWillEnter() {

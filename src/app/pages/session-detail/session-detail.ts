@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 
 import { ConferenceData } from '../../providers/conference-data';
 import { ActivatedRoute } from '@angular/router';
-import { UserProvider } from '../../providers/user-data';
+import { UserData } from '../../providers/user-data';
 
 @Component({
   selector: 'page-session-detail',
@@ -14,7 +14,7 @@ export class SessionDetailPage {
   isFavorite = false;
   constructor(
     private dataProvider: ConferenceData,
-    private userProvider: UserProvider,
+    private userProvider: UserData,
     private route: ActivatedRoute
   ) {}
 

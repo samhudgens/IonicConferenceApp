@@ -2,7 +2,7 @@ import { Component, ViewEncapsulation, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 
-import { UserProvider } from '../../providers/user-data';
+import { UserData } from '../../providers/user-data';
 
 // import { UserOptions } from '../../interfaces/user-options';
 import { User, IdName } from '../../models';
@@ -26,7 +26,7 @@ export class SignupPage implements OnInit {
 
   constructor(
     public router: Router,
-    public userProvider: UserProvider
+    public userProvider: UserData
   ) { }
 
   ngOnInit() {

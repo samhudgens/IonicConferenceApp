@@ -10,12 +10,14 @@ import { User } from '../models';
 @Injectable({
   providedIn: 'root'
 })
-export class UserProvider {
+export class UserData {
   _favorites: string[] = [];
   HAS_LOGGED_IN = 'hasLoggedIn';
   HAS_SEEN_TUTORIAL = 'hasSeenTutorial';
   usersCollection: AngularFirestoreCollection<User>;
+  userDoc: AngularFirestoreDocument<User>;
   users: Observable<User[]>;
+  user: Observable<User>;
 
   constructor(
     private afs: AngularFirestore,
@@ -54,7 +56,7 @@ export class UserProvider {
 
   logout(): Promise<any> {
     return this.storage.remove(this.HAS_LOGGED_IN).then(() => {
-      return this.storage.remove('username');
+      return this.storage.remove('user');
     }).then(() => {
       this.events.publish('user:logout');
     });
@@ -62,6 +64,19 @@ export class UserProvider {
 
   setUser(user: User): Promise<any> {
     return this.storage.set('user', user);
+  }
+
+  updateUser(user: User) {
+    this.userDoc = this.afs.doc(`users/${user.id}`);
+    this.userDoc.update(user);
+    //   .then(() => {
+    //     this.storage.set('user', user);
+    // });
+  }
+
+  getUser(): Promise<User> {
+    // this.userDoc = this.afs.doc<User>(`users/${id}`);
+    return this.storage.get('user').then(user => user);
   }
 
   getUsername(): Promise<string> {

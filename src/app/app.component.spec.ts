@@ -7,13 +7,13 @@ import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { IonicStorageModule } from '@ionic/storage';
 import { AppComponent } from './app.component';
-import { UserProvider } from './providers/user-data';
+import { UserData } from './providers/user-data';
 
 describe('AppComponent', () => {
   let eventsSpy,
     menuSpy,
     routerSpy,
-    userProviderSpy,
+    userDataSpy,
     statusBarSpy,
     splashScreenSpy,
     platformReadySpy,
@@ -25,7 +25,7 @@ describe('AppComponent', () => {
     eventsSpy = jasmine.createSpyObj('Events', ['subscribe']);
     menuSpy = jasmine.createSpyObj('MenuController', ['toggle', 'enable']);
     routerSpy = jasmine.createSpyObj('Router', ['navigateByUrl']);
-    userProviderSpy = jasmine.createSpyObj('UserProvider', ['isLoggedIn', 'logout']);
+    userDataSpy = jasmine.createSpyObj('UserData', ['isLoggedIn', 'logout']);
     statusBarSpy = jasmine.createSpyObj('StatusBar', ['styleDefault']);
     splashScreenSpy = jasmine.createSpyObj('SplashScreen', ['hide']);
     platformReadySpy = Promise.resolve();
@@ -39,7 +39,7 @@ describe('AppComponent', () => {
         { provide: Events, useValue: eventsSpy },
         { provide: MenuController, useValue: menuSpy },
         { provide: Router, useValue: routerSpy },
-        { provide: UserProvider, useValue: userProviderSpy },
+        { provide: UserData, useValue: userDataSpy },
         { provide: StatusBar, useValue: statusBarSpy },
         { provide: SplashScreen, useValue: splashScreenSpy },
         { provide: Platform, useValue: platformSpy }

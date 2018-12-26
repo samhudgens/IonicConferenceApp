@@ -2,6 +2,8 @@
 # http://git-scm.com/docs/gitignore
 www/
 
+src/environments
+
 *~
 *.sw[mnpcod]
 *.log

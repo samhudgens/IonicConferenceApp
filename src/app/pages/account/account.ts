@@ -3,7 +3,8 @@ import { Router } from '@angular/router';
 
 import { AlertController } from '@ionic/angular';
 
-import { UserProvider } from '../../providers/user-data';
+import { UserData } from '../../providers/user-data';
+import { User } from '../../models';
 
 
 @Component({
@@ -13,16 +14,28 @@ import { UserProvider } from '../../providers/user-data';
   encapsulation: ViewEncapsulation.None
 })
 export class AccountPage implements AfterViewInit {
-  username: string;
+  id: string;
+  users: User[];
+  user: User;
 
   constructor(
     public alertCtrl: AlertController,
     public router: Router,
-    public userProvider: UserProvider
+    public userProvider: UserData
   ) { }
 
   ngAfterViewInit() {
-    this.getUsername();
+    this.userProvider.getUsers().subscribe((users) => {
+      this.users = users;
+      console.log(users);
+      // console.log();
+    });
+    // this.userProvider.getUser().then((user) => {
+    //   this.id = user.id;
+    //   this.user = user;
+    //   console.log(user.id);
+    //   console.log('current user: ' + this.user.username);
+    // });
   }
 
   updatePicture() {
@@ -33,15 +46,21 @@ export class AccountPage implements AfterViewInit {
   // clicking OK will update the username and display it
   // clicking Cancel will close the alert and do nothing
   async changeUsername() {
-    const alert = await this.alertCtrl.create({
+    const changeForm = await this.alertCtrl.create({
       header: 'Change Username',
       buttons: [
         'Cancel',
         {
           text: 'Ok',
           handler: (data: any) => {
-            this.userProvider.setUsername(data.username);
-            this.getUsername();
+            if (this.isTheValueUsed(data.username)) {
+              alert(data.username + ' is already in use. Please choose another');
+            } else {
+              this.user.id = this.id;
+              this.user.username = data.username;
+              this.userProvider.updateUser(this.user);
+              console.log(this.user);
+            }
           }
         }
       ],
@@ -49,22 +68,19 @@ export class AccountPage implements AfterViewInit {
         {
           type: 'text',
           name: 'username',
-          value: this.username,
-          placeholder: 'username'
+          value: this.user.username,
+          placeholder: 'new username'
         }
       ]
     });
-    await alert.present();
+    await changeForm.present();
   }
 
-  getUsername() {
-    this.userProvider.getUsername().then((username) => {
-      this.username = username;
-    });
-  }
-
-  changePassword() {
-    console.log('Clicked to change password');
+  isTheValueUsed(value: string) {
+    if (value.indexOf('@') < 0) {
+      return this.users.find(user => user.username.toLowerCase() === value.toLowerCase());
+    }
+    return this.users.find(user => user.email.toLowerCase() === value.toLowerCase());
   }
 
   logout() {
